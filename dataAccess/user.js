@@ -5,11 +5,6 @@ function _withoutPassword(user) {
 	return userWithoutPassword;
 }
 
-async function getUserByUsernameAndPassword(username, password) {
-	const user = await User.findOne({username, password});
-	return _withoutPassword(user);
-}
-
 async function getById(id) {
 	const user = await User.findOne({id});
 	return _withoutPassword(user);
@@ -21,7 +16,7 @@ async function getByRoles(roles) {
 }
 
 async function getByParentId(parentId) {
-	const users = await User.find({parent: parentId})
+	const users = await User.find({parent: parentId});
 	return users.map(_withoutPassword);
 }
 
@@ -47,11 +42,16 @@ async function updateUser(user, update) {
 	return user;
 }
 
+async function getByNationalCode(nationalCode, withPassword = false) {
+	const user = await User.findOne({nationalCode});
+	return withPassword ? user : _withoutPassword(user);
+}
+
 module.exports = {
-	getUserByUsernameAndPassword,
 	getById,
 	getByRoles,
 	newUser,
 	getByParentId,
 	updateUser,
+	getByNationalCode,
 };

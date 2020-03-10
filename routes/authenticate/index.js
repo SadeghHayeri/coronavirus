@@ -1,18 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const HttpStatus = require('http-status-codes');
-const local = require('../../config/local');
-const { user: userService } = require('../../domin');
+const { authenticate: authenticateService } = require('../../domin');
 
 router.post('/', async (req, res) => {
-	const {username, passowrd} = req.body;
-	const user = await userService.authenticate(username, passowrd);
+	const {nationalCode, password} = req.body;
+	const user = await authenticateService.authenticate(nationalCode, password);
+	res.json({user});
+});
 
-	if (user) {
-		res.json(user);
-	} else {
-		res.status(HttpStatus.UNAUTHORIZED).json({ message: local.BAD_USERNAME_OR_PASSWORD });
-	}
+router.put('/', async (req, res) => {
+	const {nationalCode, password, newPassword} = req.body;
+	const user = await authenticateService.resetPassword(nationalCode, password, newPassword);
+	res.json({user});
 });
 
 module.exports = router;
