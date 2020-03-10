@@ -1,22 +1,22 @@
 // TODO: Throw new error, and handle with errorHandler middleware
 
-const { user: userDA } = require('../../dataAccess');
-const { ROLE } = require('../../config/enums');
-const accessController = require('./accessController');
+const { user: userDA, statusHistory: statusHistoryDA } = require('../../dataAccess');
+const { ROLES } = require('../../config/enums');
+const accessController = require('../accessController');
 
 async function getChildUsers(user) {
 	const {id: userId, role: userRole} = user;
 
 	switch (userRole) {
-		case ROLE.ADMIN:
-			return userDA.getByRoles(Object.values(ROLE));
-		case ROLE.CHIEF:
-			return userDA.getByRoles([ROLE.STAFF, ROLE.FAMILY_HEAD, ROLE.PATIENT]);
-		case ROLE.FAMILY_HEAD:
+		case ROLES.ADMIN:
+			return userDA.getByRoles(Object.values(ROLES));
+		case ROLES.CHIEF:
+			return userDA.getByRoles([ROLES.STAFF, ROLES.FAMILY_HEAD, ROLES.PATIENT]);
+		case ROLES.FAMILY_HEAD:
 			const self = await userDA.getById(userId);
 			const child = await userDA.getByParentId(userId);
 			return [self, ...child];
-		case ROLE.PATIENT:
+		case ROLES.PATIENT:
 			return userDA.getById(userId);
 	}
 	return [];
@@ -38,6 +38,10 @@ async function editUser(user, userId, update) {
 		throw new Error('FORBIDDEN');
 	}
 
+	if (update.status && user.status !== update.status) {
+		statusHistoryDA.logChangeStatusHistory(user.id, userId, update.status);
+	}
+
 	return userDA.updateUser(targetUser, update);
 }
 
@@ -51,9 +55,20 @@ async function getUser(user, userId) {
 	return userDA.updateUser(targetUser, update);
 }
 
+async function getChangeStatusHistory(user, userId) {
+	const targetUser = await userDA.getById(userId);
+
+	if (!accessController.hasReadAccess(user, targetUser)) {
+		throw new Error('FORBIDDEN');
+	}
+
+	return statusHistoryDA.getUserChangeStatusHistory(userId);
+}
+
 module.exports = {
 	getUser,
 	createUser,
 	editUser,
 	getChildUsers,
+	getChangeStatusHistory,
 };

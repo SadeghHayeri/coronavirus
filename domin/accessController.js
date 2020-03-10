@@ -1,17 +1,17 @@
-const { ROLE } = require('../../config/enums');
+const { ROLES } = require('../config/enums');
 
 function _hasDefaultAccess(user, targetUser) {
 	switch (targetUser.role) {
-		case ROLE.ADMIN:
-		case ROLE.CHIEF:
-			return [ROLE.ADMIN].includes(user.role);
-		case ROLE.STAFF:
-			return [ROLE.ADMIN, ROLE.CHIEF].includes(user.role);
-		case ROLE.FAMILY_HEAD:
-		case ROLE.PATIENT:
-			return [ROLE.ADMIN, ROLE.CHIEF, ROLE.STAFF].includes(user.role);
+		case ROLES.ADMIN:
+		case ROLES.CHIEF:
+			return [ROLES.ADMIN].includes(user.role);
+		case ROLES.STAFF:
+			return [ROLES.ADMIN, ROLES.CHIEF].includes(user.role);
+		case ROLES.FAMILY_HEAD:
+		case ROLES.PATIENT:
+			return [ROLES.ADMIN, ROLES.CHIEF, ROLES.STAFF].includes(user.role);
 		default:
-			throw new Error('BAD ROLE'); // TODO: Use error classes
+			throw new Error('BAD ROLES'); // TODO: Use error classes
 	}
 }
 
@@ -20,7 +20,7 @@ function hasCreateAccess(user, targetUser) {
 }
 
 function hasEditAccess(user, targetUser, update) {
-	if (user.role === ROLE.ADMIN) {
+	if (user.role === ROLES.ADMIN) {
 		return true;
 	}
 

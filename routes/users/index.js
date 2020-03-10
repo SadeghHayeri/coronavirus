@@ -30,4 +30,12 @@ router.put('/:id', authorize(), async (req, res) => {
 	res.json({user: updatedUser});
 });
 
+router.get('/:id/statusHistory', async (req, res) => {
+	const userId = parseInt(req.params.id);
+	const {user} = req.body;
+
+	const statusHistory = await userService.getChangeStatusHistory(user, userId);
+	res.json({statusHistory});
+});
+
 module.exports = router;

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const dataAccess = require('../../dataAccess');
-const { JWT_SECRET } = require('../../config/tokens');
+const dataAccess = require('../dataAccess');
+const { JWT_SECRET } = require('../config/tokens');
 
 async function authenticate(username, password) {
 	const user = await dataAccess.user.getUserByUsernameAndPassword(username, password);
