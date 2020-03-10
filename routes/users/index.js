@@ -6,25 +6,31 @@ const HttpStatus = require('http-status-codes');
 const local = require('../../config/local');
 const authorize = require('../../middlewares/authorize');
 
-router.get('/', authorize([ROLES.ADMIN]), async (req, res) => {
-	const allUsers = await userService.getAll();
-	res.json({ users: allUsers });
+router.get('/', authorize(), async (req, res) => {
+	const childUsers = await userService.getChildUsers(req.user);
+	res.json({ users: childUsers });
 });
 
-router.get('/:id', async (req, res) => {
-	const id = parseInt(req.params.id);
+router.get('/:id', authorize(), async (req, res) => {
+	const targetId = parseInt(req.params.id);
 
-	const authorizedRoles = [ROLES.ADMIN, ROLES.CHIEF, ROLES.STAFF];
-	if (req.user.id !== id && authorizedRoles.includes(req.user.role)) {
-		return res.status(HttpStatus.UNAUTHORIZED).json({ message: local.UNAUTHORIZED_ERROR });
-	}
-
-	const user = await userService.getById(id);
-	if (!user) {
+	const targetUser = await userService.getById(targetId);
+	if (!targetUser) {
 		return res.status(HttpStatus.NOT_FOUND).json({ message: local.NOT_FOUND_ERROR });
 	}
 
-	res.json({ user });
+
+	if (!userService.hasAccessOnOtherUser(req.user, targetUser)) {
+		return res.status(HttpStatus.FORBIDDEN).json({ message: local.FORBIDDEN_ERROR });
+	}
+
+	res.json({ user: targetUser });
+});
+
+router.post('/', authorize(), async (req, res) => {
+	const userInfo = req.body;
+	const newUser = userService.createUser(req.user, userInfo);
+	res.json({ user: newUser });
 });
 
 module.exports = router;

@@ -8,12 +8,24 @@ async function getById(id) {
 	return User.findOne({id});
 }
 
-async function getAll() {
-	return User.find({});
+async function getByRoles(roles) {
+	return User.find({role: {'$in': roles}});
+}
+
+async function getByRegistrarId(registrarId) {
+	return User.find({registrarId});
+}
+
+async function newUser(userInfo) {
+	const newUser = new User(userInfo);
+	await newUser.save();
+	return newUser;
 }
 
 module.exports = {
 	getUserByUsernameAndPassword,
 	getById,
-	getAll,
+	getByRoles,
+	newUser,
+	getByRegistrarId,
 };

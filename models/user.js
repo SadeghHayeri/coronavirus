@@ -1,22 +1,49 @@
 const mongoose = require('mongoose');
-const { ROLES } = require('../config/enums');
+const { ROLES, STATUS } = require('../config/enums');
 
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-	username: {
+	role: {
+		type: String,
+		enum: Object.values(ROLES),
+		required: true,
+	},
+	nationalCode: {
+		type: String,
+		required: true,
+		trim: true
+	},
+	firstName: {
+		type: String,
+		required: true,
+		trim: true
+	},
+	lastName: {
 		type: String,
 		required: true,
 		trim: true
 	},
 	password: {
 		type: String,
-		required: true
 	},
-	role: {
+	birthDate: {
+		type: Date,
+	},
+	sex: {
 		type: String,
-		enum: Object.values(ROLES),
+		enum: ['male', 'female'],
+		required: true,
 	},
+	status: {
+		type: String,
+		enum: Object.values(STATUS),
+		default: STATUS.NORMAL,
+	},
+	registrarId: {
+		type: Schema.Types.ObjectId,
+		default: this,
+	}
 });
 
 const User = mongoose.model('user', UserSchema);

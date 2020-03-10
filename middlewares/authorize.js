@@ -1,6 +1,7 @@
 const expressJwt = require('express-jwt');
 const { JWT_SECRET } = require('../config/tokens');
-
+const HttpStatus = require('http-status-codes');
+const local = require('../../config/local');
 
 function authorize(roles = []) {
 	if (typeof roles === 'string') {
@@ -12,7 +13,7 @@ function authorize(roles = []) {
 
 		(req, res, next) => {
 			if (roles.length && !roles.includes(req.user.role)) {
-				return res.status(401).json({ message: 'Unauthorized' });
+				return res.status(HttpStatus.FORBIDDEN).json({ message: local.FORBIDDEN_ERROR });
 			}
 			next();
 		}
