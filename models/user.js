@@ -40,7 +40,11 @@ const UserSchema = new Schema({
 		enum: Object.values(STATUS),
 		default: STATUS.NORMAL,
 	},
-	registrarId: {
+	registrar: {
+		type: Schema.Types.ObjectId,
+		default: this,
+	},
+	parent: {
 		type: Schema.Types.ObjectId,
 		default: this,
 	}

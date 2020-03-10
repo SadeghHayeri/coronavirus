@@ -1,87 +1,59 @@
-const authenticate = require('./autenticate');
+// TODO: Throw new error, and handle with errorHandler middleware
+
 const { user: userDA } = require('../../dataAccess');
 const { ROLE } = require('../../config/enums');
-
-function _withoutPassword(user) {
-	const { password, ...userWithoutPassword } = user;
-	return userWithoutPassword;
-}
-
-// TODO: Use pagination
-async function getByRoles(roles) {
-	const users = await userDA.getByRoles(roles);
-	return users.map(_withoutPassword);
-}
-
-async function getByRegistrarId(registrarId) {
-	const users = await userDA.getByRegistrarId(roles);
-	return users.map(_withoutPassword);
-};
-
-async function getById(id, withPassword = false) {
-	const user = await userDA.getById(id);
-	return withPassword ? user : _withoutPassword(user);
-}
+const accessController = require('./accessController');
 
 async function getChildUsers(user) {
 	const {id: userId, role: userRole} = user;
 
 	switch (userRole) {
 		case ROLE.ADMIN:
-			return getByRoles(Object.values(ROLE));
+			return userDA.getByRoles(Object.values(ROLE));
 		case ROLE.CHIEF:
-			return getByRoles([ROLE.STAFF, ROLE.FAMILY_HEAD, ROLE.PATIENT]);
+			return userDA.getByRoles([ROLE.STAFF, ROLE.FAMILY_HEAD, ROLE.PATIENT]);
 		case ROLE.FAMILY_HEAD:
-			const self = await getById(userId);
-			const child = await getByRegistrarId(userId);
+			const self = await userDA.getById(userId);
+			const child = await userDA.getByParentId(userId);
 			return [self, ...child];
 		case ROLE.PATIENT:
-			return getById(userId);
+			return userDA.getById(userId);
 	}
 	return [];
 }
 
-function hasAccessOnOtherUser(user, targetUser) {
-	const {id: userId, role: userRole} = user;
-
-	if (userId === targetUser.id) {
-		return true;
+async function createUser(user, newUser) {
+	if (!accessController.hasCreateAccess(user, newUser)) {
+		throw new Error('FORBIDDEN'); // TODO: Use error classes
 	}
 
-	switch (userRole) {
-		case ROLE.ADMIN:
-			return true;
-		case ROLE.CHIEF:
-			return [ROLE.STAFF, ROLE.FAMILY_HEAD, ROLE.PATIENT].includes(targetUser.role);
-		case ROLE.FAMILY_HEAD:
-			return targetUser.registrarId === userId;
-		case ROLE.PATIENT:
-			return false;
-	}
-	return false;
+	newUser.registrar = user.id;
+	return userDA.newUser(newUser);
 }
 
-// TODO: Throw new error, and handle with errorHandler middleware
-async function createUser(user, userInfo) {
-	const {role: newUserRole} = userInfo;
-	const {id: userId, role: userRole} = user;
+async function editUser(user, userId, update) {
+	const targetUser = await userDA.getById(userId);
 
-	if ((newUserRole === ROLES.ADMIN && ![ROLES.ADMIN].includes(userRole))
-		|| (newUserRole === ROLES.CHIEF && ![ROLES.ADMIN].includes(userRole))
-		|| (newUserRole === ROLES.STAFF && ![ROLES.ADMIN, ROLES.CHIEF].includes(userRole))
-		|| (newUserRole === ROLES.FAMILY_HEAD && ![ROLES.ADMIN, ROLES.CHIEF, ROLES.STAFF].includes(userRole))
-		|| (newUserRole === ROLES.PATIENT && userRole === ROLE.PATIENT)) {
-		throw new Error('UNAUTHORIZED'); // TODO: Use error classes
+	if (!accessController.hasEditAccess(user, targetUser)) {
+		throw new Error('FORBIDDEN');
 	}
 
-	userInfo.registrarId = userId;
-	return userDA.newUser(userInfo);
+	return userDA.updateUser(targetUser, update);
+}
+
+async function getUser(user, userId) {
+	const targetUser = await userDA.getById(userId);
+
+	if (!accessController.hasReadAccess(user, targetUser)) {
+		throw new Error('FORBIDDEN');
+	}
+
+	return userDA.updateUser(targetUser, update);
 }
 
 module.exports = {
-	authenticate,
-	getById,
+	getUser,
 	createUser,
+	editUser,
 	getChildUsers,
-	hasAccessOnOtherUser,
 };
