@@ -5,16 +5,15 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  apidoc:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
     
-    - name: test
-      run: ls
-
-    - name: OpenAPI Diff
-      uses: mvegter/openapi-diff-action@v0.1.1
+    - name: Build
+      uses: andstor/jsdoc-action@v1
       with:
-        spec-file-path: ./coronavirus/apidoc/swagger.json
+        source_dir: .
+        recurse: true
+        output_dir: ./apidoc
