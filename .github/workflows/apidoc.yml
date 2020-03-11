@@ -9,17 +9,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build
-        uses: andstor/jsdoc-action@v1
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
         with:
-          source_dir: .
-          output_dir: ./apidoc
-          config_file: apidoc.json
-          template_name: minami
-          front_page: README.md
+          node-version: 12
+
+      - name: Install apidoc
+        run: npm i -g apidoc
+      
+      - name: Bulid
+        run: apidoc -i routes/ -i models/ -o apidoc
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
