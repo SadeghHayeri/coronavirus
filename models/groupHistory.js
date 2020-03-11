@@ -3,6 +3,15 @@ const { GROUPS } = require('../config/enums');
 
 const Schema = mongoose.Schema;
 
+/**
+ * @api {OBJECT} GroupHistory GroupHistory
+ * @apiGroup models
+ * @apiParam {String} user userId
+ * @apiParam {String="NO_RISK", "LOW_RISK", "MEDIUM_RISK", "HIGH_RISK"} group
+ * @apiParam {Number} changeAt timestamp
+ * @apiParam {String} editBy userId (null means edited by system)
+ */
+
 const GroupHistorySchema = new Schema({
 	user: {
 		type: Schema.Types.ObjectId,

@@ -25,8 +25,8 @@ async function authenticate(nationalCode, password) {
 	const token = getToken(user);
 	const {password: _, ...userWithoutPassword} = user;
 	return {
-		...userWithoutPassword,
-		token
+		user: userWithoutPassword,
+		token,
 	};
 }
 
@@ -47,8 +47,8 @@ async function resetPassword(nationalCode, password, newPassword) {
 	const token = getToken(user);
 	const {password: _, ...userWithoutPassword} = user;
 	return {
-		...userWithoutPassword,
-		token
+		user: userWithoutPassword,
+		token,
 	};
 }
 

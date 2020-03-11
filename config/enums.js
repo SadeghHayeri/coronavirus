@@ -13,7 +13,6 @@ const enums = {
 		LOW_RISK: 'LOW_RISK',
 		MEDIUM_RISK: 'MEDIUM_RISK',
 		HIGH_RISK: 'HIGH_RISK',
-		CRITICAL: 'CRITICAL',
 	},
 
 	STATUS: {
@@ -22,6 +21,11 @@ const enums = {
 		SICK_AND_DISCHARGE: 'SICK_AND_DISCHARGE',
 		CURED: 'CURED',
 		DEAD: 'DEAD',
+	},
+
+	SEX: {
+		MALE: 'MALE',
+		FEMALE: 'FEMALE',
 	}
 };
 

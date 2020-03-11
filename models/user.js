@@ -1,10 +1,30 @@
 const mongoose = require('mongoose');
-const { ROLES, STATUS, GROUPS } = require('../config/enums');
+const { ROLES, STATUS, GROUPS, SEX } = require('../config/enums');
 const { SALT_ROUND } = require('../config/tokens');
 
 const bcrypt = require('bcrypt');
 
 const Schema = mongoose.Schema;
+
+
+/**
+ * @api {OBJECT} User User
+ * @apiGroup models
+ * @apiParam {Number} id
+ * @apiParam {String="ADMIN", "CHIEF", "STAFF", "FAMILY_HEAD", "PATIENT"} role
+ * @apiParam {String} nationalCode
+ * @apiParam {String} firstName
+ * @apiParam {String} lastName
+ * @apiParam {String} password
+ * @apiParam {Number} birthDate timestamp
+ * @apiParam {String="MALE", "FEMALE"} sex
+ * @apiParam {String="NORMAL", "SICK_AND_HOSPITALIZED", "SICK_AND_DISCHARGE", "CURED", "DEAD"} status
+ * @apiParam {String="NO_RISK", "LOW_RISK", "MEDIUM_RISK", "HIGH_RISK"} group
+ * @apiParam {String} registrar userId
+ * @apiParam {String} parent userId
+ * @apiParam {Boolean} isActive
+ * @apiParam {Boolean} needResetPassword
+ */
 
 const UserSchema = new Schema({
 	role: {
@@ -32,11 +52,11 @@ const UserSchema = new Schema({
 		default: '',
 	},
 	birthDate: {
-		type: Date,
+		type: Number,
 	},
 	sex: {
 		type: String,
-		enum: ['male', 'female'],
+		enum: Object.values(SEX),
 		required: true,
 	},
 	status: {
