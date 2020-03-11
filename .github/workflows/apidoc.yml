@@ -1,0 +1,17 @@
+name: APIDOC
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: OpenAPI Diff
+      uses: mvegter/openapi-diff-action@v0.1.1
+      with:
+        spec-file-path: ./apidoc/swagger.json
