@@ -10,8 +10,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
+    - name: test
+      run: ls
 
     - name: OpenAPI Diff
       uses: mvegter/openapi-diff-action@v0.1.1
       with:
-        spec-file-path: /home/runner/work/coronavirus/coronavirus/apidoc/swagger.json
+        spec-file-path: ./coronavirus/apidoc/swagger.json
