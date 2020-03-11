@@ -5,6 +5,16 @@ const {user: userService} = require('../../domin');
 // const local = require('../../config/local');
 const authorize = require('../../middlewares/authorize');
 
+/**
+ * @api {get} /user Get all users
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {String} firstname Firstname of the User.
+ * @apiSuccess {String} lastname  Lastname of the User.
+ */
 router.get('/', authorize(), async (req, res) => {
 	const childUsers = await userService.getChildUsers(req.user);
 	res.json({users: childUsers});

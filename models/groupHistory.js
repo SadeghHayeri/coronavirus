@@ -22,6 +22,6 @@ const GroupHistorySchema = new Schema({
 	}
 });
 
-const groupHistory = mongoose.model('statusHistory', GroupHistorySchema);
+const groupHistory = mongoose.model('groupHistory', GroupHistorySchema);
 
 module.exports = groupHistory;
