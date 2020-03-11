@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const {user: userService} = require('../../domin');
-const HttpStatus = require('http-status-codes');
-const local = require('../../config/local');
+// const HttpStatus = require('http-status-codes');
+// const local = require('../../config/local');
 const authorize = require('../../middlewares/authorize');
 
 router.get('/', authorize(), async (req, res) => {
@@ -35,6 +35,14 @@ router.get('/:id/statusHistory', async (req, res) => {
 	const {user} = req.body;
 
 	const statusHistory = await userService.getChangeStatusHistory(user, userId);
+	res.json({statusHistory});
+});
+
+router.get('/:id/groupHistory', async (req, res) => {
+	const userId = parseInt(req.params.id);
+	const {user} = req.body;
+
+	const statusHistory = await userService.getChangeGroupHistory(user, userId);
 	res.json({statusHistory});
 });
 

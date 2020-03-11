@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { ROLES, STATUS } = require('../config/enums');
+const { ROLES, STATUS, GROUPS } = require('../config/enums');
 const { SALT_ROUND } = require('../config/tokens');
 
 const bcrypt = require('bcrypt');
@@ -43,6 +43,11 @@ const UserSchema = new Schema({
 		type: String,
 		enum: Object.values(STATUS),
 		default: STATUS.NORMAL,
+	},
+	group: {
+		type: String,
+		enum: Object.values(GROUPS),
+		default: GROUPS.NO_RISK,
 	},
 	registrar: {
 		type: Schema.Types.ObjectId,

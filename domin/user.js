@@ -1,8 +1,8 @@
 // TODO: Throw new error, and handle with errorHandler middleware
 
-const { user: userDA, statusHistory: statusHistoryDA } = require('../../dataAccess');
-const { ROLES } = require('../../config/enums');
-const accessController = require('../accessController');
+const { user: userDA, statusHistory: statusHistoryDA, groupHistory: groupHistoryDA  } = require('../dataAccess');
+const { ROLES } = require('../config/enums');
+const accessController = require('./accessController');
 
 async function getChildUsers(user) {
 	const {id: userId, role: userRole} = user;
@@ -42,6 +42,10 @@ async function editUser(user, userId, update) {
 		statusHistoryDA.logChangeStatusHistory(user.id, userId, update.status);
 	}
 
+	if (update.group && user.group !== update.group) {
+		groupHistoryDA.logChangeGroupHistory(user.id, userId, update.group);
+	}
+
 	return userDA.updateUser(targetUser, update);
 }
 
@@ -65,10 +69,21 @@ async function getChangeStatusHistory(user, userId) {
 	return statusHistoryDA.getUserChangeStatusHistory(userId);
 }
 
+async function getChangeGroupHistory(user, userId) {
+	const targetUser = await userDA.getById(userId);
+
+	if (!accessController.hasReadAccess(user, targetUser)) {
+		throw new Error('FORBIDDEN');
+	}
+
+	return groupHistoryDA.getUserChangeGroupHistory(userId);
+}
+
 module.exports = {
 	getUser,
 	createUser,
 	editUser,
 	getChildUsers,
 	getChangeStatusHistory,
+	getChangeGroupHistory,
 };
